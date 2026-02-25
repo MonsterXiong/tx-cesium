@@ -1,6 +1,3 @@
-<<<<<<< HEAD
-# react-template
-=======
 # React Template
 
 基于 React 18 + Vite 5 + Antd 6 + Cesium + TypeScript 的现代化前端框架
@@ -201,4 +198,3 @@ MIT License
 ## 🤝 贡献
 
 欢迎提交 Issue 和 Pull Request！
->>>>>>> 8d19ee7 (init)
