@@ -29,7 +29,11 @@
       "minimumPixelSize": 10,
       "distanceDisplayCondition": {
         "distanceDisplayCondition": [0, 10000]
-      }
+      },
+      "silhouetteColor": {
+        "rgba": [255, 0, 0, 255]
+      },
+      "silhouetteSize": 2.0
     },
     "billboard": {
       "image": "/public/static/cesium-resources/symbol/curve-flag.svg",
@@ -64,7 +68,11 @@
       "distanceDisplayCondition": {
         "distanceDisplayCondition": [0, 5000]
       },
-      "heightReference": "CLAMP_TO_GROUND"
+      "heightReference": "CLAMP_TO_GROUND",
+      "silhouetteColor": {
+        "rgba": [255, 0, 0, 255]
+      },
+      "silhouetteSize": 2.0
     },
     "billboard": {
       "image": "/public/static/cesium-resources/symbol/curve-flag.svg",
