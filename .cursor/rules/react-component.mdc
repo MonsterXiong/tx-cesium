@@ -1,0 +1,98 @@
+---
+description: React/TSX 组件编写规范 — 组件模式、Props 定义、Hooks 使用、Antd 组件约定
+globs: **/*.tsx
+alwaysApply: false
+---
+
+# React 组件规范
+
+## 组件结构模板
+
+```tsx
+/**
+ * 组件名称
+ * 组件功能简述
+ */
+
+import { useState } from 'react'
+import { Button } from 'antd'
+import type { FC } from 'react'
+
+/**
+ * 组件 Props 接口
+ */
+interface XxxProps {
+  /** 属性说明 */
+  propName: string
+  /** 可选属性说明 */
+  optionalProp?: number
+  /** 事件回调 */
+  onAction?: () => void
+}
+
+/**
+ * 组件说明
+ * @param props 组件属性
+ * @returns React 组件
+ */
+const Xxx: FC<XxxProps> = ({ propName, optionalProp, onAction }) => {
+  // Hooks
+  const [state, setState] = useState(false)
+
+  // 事件处理
+  const handleClick = () => {
+    console.log('[DEBUG_APP] 操作:', propName)
+    onAction?.()
+  }
+
+  // 渲染
+  return (
+    <div className="flex-center p-4">
+      <Button onClick={handleClick}>{propName}</Button>
+    </div>
+  )
+}
+
+export default Xxx
+```
+
+## 核心规则
+
+1. **只用函数式组件 + Hooks**，禁止 class 组件
+2. **Props 必须定义 interface**，每个字段加 `/** */` 注释
+3. **组件用 `FC<Props>` 类型**，导出用 `export default`
+4. **复用逻辑抽成自定义 Hook**，放在 `src/hooks/` 或页面 `hooks/` 目录
+
+## Hooks 使用规范
+
+- 全局状态：`useThemeStore`、`useUserStore`、`useAppStore`（Zustand）
+- 主题操作：`useTheme`（来自 `@/hooks`）
+- Cesium 操作：`useCesiumViewer`（来自 `@/hooks`）
+- 通用 Hooks：优先使用 `ahooks` 库
+
+## Antd 组件约定
+
+- 使用 Ant Design 6 组件，不要引入第三方 UI 库
+- 图标按需导入：`import { UserOutlined } from '@ant-design/icons'`
+- 表单使用 `Form.useForm()` 管理状态
+- 表格使用 `columns` 配置 + TypeScript 泛型
+
+## 样式写法
+
+```tsx
+// 优先使用 UnoCSS 工具类
+<div className="flex items-center gap-4 p-4 bg-bg-container rounded-lg">
+
+// 使用预定义快捷方式
+<div className="flex-center">
+<div className="card-base">
+
+// 复杂样式用独立 CSS 文件
+import './component-name.css'
+```
+
+## 页面组件约定
+
+- 页面放在 `src/pages/页面名/index.tsx`
+- 页面专用组件放在 `src/pages/页面名/components/`
+- 新页面必须在 `src/routes/config.tsx` 注册路由

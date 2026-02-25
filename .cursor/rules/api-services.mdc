@@ -1,0 +1,115 @@
+---
+description: API 服务层开发规范 — 请求封装使用、接口定义、类型约定、错误处理
+globs: src/services/**
+alwaysApply: false
+---
+
+# API 服务层规范
+
+## 架构概览
+
+```
+src/services/
+├── request.ts          — Axios 封装（拦截器、错误处理、Request 类）
+└── api/
+    └── index.ts        — API 接口定义（按模块分组）
+
+src/types/
+├── api.d.ts            — API 请求/响应类型
+└── global.d.ts         — 全局类型（ResponseData 等）
+```
+
+## 使用 request 封装
+
+所有 API 请求必须使用 `src/services/request.ts` 导出的 `request` 实例，禁止直接使用 axios。
+
+```typescript
+import { request } from '../request'
+
+// GET 请求
+request.get<UserInfo>('/user/info')
+
+// POST 请求
+request.post<LoginResponse>('/auth/login', { username, password })
+
+// 文件上传
+request.upload<UploadResult>('/upload', file, (progress) => {
+  console.log('[DEBUG_REQUEST] 上传进度:', progress)
+})
+
+// 文件下载
+request.download('/export/data', '数据报表.xlsx')
+```
+
+## 添加新 API 接口
+
+### 步骤一：定义类型（`src/types/api.d.ts`）
+
+```typescript
+/** 查询参数 */
+export interface QueryParams {
+  /** 页码 */
+  page: number
+  /** 每页条数 */
+  pageSize: number
+  /** 搜索关键词 */
+  keyword?: string
+}
+
+/** 查询响应 */
+export interface QueryResponse<T> {
+  list: T[]
+  total: number
+}
+```
+
+### 步骤二：定义接口（`src/services/api/index.ts`）
+
+按业务模块分组，每个方法必须有 JSDoc 注释和完整的泛型类型。
+
+```typescript
+/**
+ * 订单相关 API
+ */
+export const orderApi = {
+  /**
+   * 获取订单列表
+   * @param params 查询参数
+   * @returns 订单列表响应
+   */
+  getList(params: QueryParams): Promise<QueryResponse<Order>> {
+    return request.get('/order/list', { params })
+  },
+
+  /**
+   * 创建订单
+   * @param data 订单数据
+   * @returns 订单ID
+   */
+  create(data: CreateOrderData): Promise<{ id: string }> {
+    return request.post('/order/create', data)
+  },
+}
+```
+
+## 错误处理
+
+- request.ts 已全局处理 401（跳转登录）、403、404、500 等状态码
+- 业务层使用 try/catch 捕获特定错误：
+
+```typescript
+try {
+  const data = await userApi.getUserInfo()
+} catch (error) {
+  console.error('[DEBUG_REQUEST] 获取用户信息失败:', error)
+  message.error('获取用户信息失败')
+}
+```
+
+## 规则
+
+1. **禁止直接使用 axios**，必须使用 `request` 封装
+2. **请求/响应类型定义在 `src/types/api.d.ts`**
+3. **每个 API 方法必须有 JSDoc + 泛型返回类型**
+4. **Console 日志使用 `[DEBUG_REQUEST]` 或 `[DEBUG_RESPONSE]` 前缀**
+5. **baseURL 通过环境变量 `VITE_APP_BASE_API` 配置**

@@ -1,0 +1,158 @@
+---
+description: 项目全局规则 — 技术栈、目录结构、命名约定、注释规范、调试规范
+alwaysApply: true
+---
+
+# 项目全局规则
+
+## 技术栈
+
+- React 19 + TypeScript 5.9 + Vite 7
+- UI 组件库：Ant Design 6（不要引入其他 UI 库）
+- 状态管理：Zustand 5（stores 目录，命名 useXxxStore）
+- 样式方案：UnoCSS（Tailwind 兼容语法 + CSS Variables）
+- 路由：React Router 7（配置式路由，`routes/config.tsx`）
+- 3D 地图：Cesium（封装在 `src/cesium/`）
+- HTTP 请求：Axios（封装在 `src/services/request.ts`）
+- 工具库：ahooks
+
+## 路径别名
+
+使用 `@/*` 映射到 `src/*`，禁止使用超过两层的相对路径。
+
+```typescript
+// 正确
+import { useTheme } from '@/hooks'
+import { storage } from '@/utils/storage'
+
+// 错误
+import { useTheme } from '../../../hooks'
+```
+
+## 目录结构约定
+
+| 目录 | 用途 | 命名规范 |
+|------|------|----------|
+| `src/pages/` | 页面组件 | 文件夹 kebab-case，主文件 index.tsx |
+| `src/components/common/` | 通用组件 | PascalCase 文件夹 + index.tsx |
+| `src/components/business/` | 业务组件 | PascalCase 文件夹 + index.tsx |
+| `src/hooks/` | 自定义 Hooks | camelCase，use 前缀 |
+| `src/stores/` | Zustand Store | camelCase，useXxxStore.ts |
+| `src/services/` | API 服务 | camelCase |
+| `src/utils/` | 工具函数 | camelCase |
+| `src/types/` | 类型定义 | kebab-case.d.ts |
+| `src/styles/` | 全局样式 | kebab-case.css |
+| `src/cesium/` | Cesium 封装 | 组件 PascalCase，其他 camelCase |
+
+## 注释规范
+
+### 文件头部注释（必须）
+
+```typescript
+/**
+ * 模块名称
+ * 模块功能简述
+ */
+```
+
+### 函数/方法 JSDoc（必须）
+
+```typescript
+/**
+ * 功能描述
+ * @param paramName 参数说明
+ * @returns 返回值说明
+ */
+```
+
+### 接口/类型字段注释
+
+```typescript
+interface UserInfo {
+  /** 用户ID */
+  id: string | number
+  /** 用户名 */
+  username: string
+}
+```
+
+## Console 调试规范
+
+所有 console 必须使用 `[DEBUG_模块名]` 前缀：
+
+- `[DEBUG_USER]` — 用户相关
+- `[DEBUG_CESIUM]` — Cesium 相关
+- `[DEBUG_THEME]` — 主题相关
+- `[DEBUG_REQUEST]` / `[DEBUG_RESPONSE]` — 请求相关
+- `[DEBUG_STORAGE]` — 存储相关
+- `[DEBUG_APP]` — 应用通用
+
+```typescript
+console.log('[DEBUG_USER] 用户已登录:', userInfo.username)
+```
+
+## 样式规范
+
+1. 优先使用 UnoCSS 工具类，不要写行内 style
+2. 颜色使用 CSS Variables（`text-primary`、`bg-bg-container`），不要硬编码
+3. 使用预定义快捷方式：`flex-center`、`flex-between`、`card-base`、`transition-base`
+4. 复杂样式抽成独立 .css 文件
+
+## 命名规范
+
+| 类型 | 规范 | 示例 |
+|------|------|------|
+| React 组件 | PascalCase | `UserCard`、`BasicLayout` |
+| 页面文件夹 | kebab-case | `cesium-view/`、`not-found/` |
+| Hooks | camelCase + use 前缀 | `useTheme`、`useCesium` |
+| 变量/函数 | camelCase | `userName`、`handleClick` |
+| 常量 | UPPER_SNAKE_CASE | `MAX_COUNT`、`API_BASE_URL` |
+| CSS 文件 | kebab-case | `cesium-viewer.css` |
+
+## 数据结构规范
+
+后端返回数据或用于渲染的数据，统一洗成以下标准结构：
+
+```typescript
+interface StandardItem<T = any> {
+  /** 唯一标识（后备） */
+  id: string | number
+  /** 唯一标识（优先） */
+  key: string | number
+  /** 显示名称（后备） */
+  name: string
+  /** 显示名称（优先） */
+  label: string
+  /** 业务原始数据 */
+  bindData: T
+}
+```
+
+**取值优先级：**
+
+- 唯一值：优先用 `key`，其次 `id`
+- 渲染名称：优先用 `label`，其次 `name`
+- 业务原始数据：存储在 `bindData` 内，不在外层散落字段
+
+```typescript
+// 正确：后端数据洗成标准结构
+const list = rawData.map(item => ({
+  id: item.userId,
+  key: item.userId, // 可选项
+  name: item.userName,
+  label: item.userName, // 可选项
+  bindData: item,
+}))
+
+// 使用时
+<Select options={list} fieldNames={{ value: 'key', label: 'label' }} />
+```
+
+## 关键规则
+
+- 新建页面必须在 `routes/config.tsx` 中注册路由
+- 所有 API 请求必须经过 `src/services/request.ts` 封装
+- 全局状态用 Zustand Store，组件局部状态用 useState
+- 主题变量定义在 `src/styles/variables.css`
+- 禁止使用 `any` 类型，必须定义明确的 TypeScript 类型
+- 后端/渲染数据统一洗成 `{ id, key, name, label, bindData }` 标准结构

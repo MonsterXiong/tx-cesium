@@ -1,0 +1,78 @@
+[
+  {
+    "id":"document",
+    "version":"1.0"
+  },
+  {
+    "id": "aircraft-1",
+    "name": "j20-1",
+    "position": {
+      "interpolationAlgorithm": "LAGRANGE",
+      "interpolationDegree": 5,
+      "epoch": "2025-07-21T16:00:00Z",
+      "cartographicDegrees": [
+        0, 139.69652636233502, 35.688096473634445, 130.44016762964581,
+        10, 139.69646460372948, 35.68909628693758, 131.27498585605414,
+        20, 139.6952032133655, 35.689337591772855, 149.53462474052557
+      ],
+      "forwardExtrapolationType": "HOLD",
+      "forwardExtrapolationDuration": 3600000,
+      "backwardExtrapolationType": "HOLD",
+      "backwardExtrapolationDuration": 3600000
+    },
+    "orientation": {
+      "velocityReference": "#position"
+    },
+    "model": {
+      "gltf": "/static/cesium-resources/model/j20.glb",
+      "scale": 0.1,
+      "minimumPixelSize": 10,
+      "distanceDisplayCondition": {
+        "distanceDisplayCondition": [0, 10000]
+      }
+    },
+    "billboard": {
+      "image": "/public/static/cesium-resources/symbol/curve-flag.svg",
+      "scale": 0.8,
+      "distanceDisplayCondition": {
+        "distanceDisplayCondition": [10000, 1e7]
+      }
+    }
+  },
+  {
+    "id": "tank-1",
+    "name": "tank-1",
+    "position": {
+      "epoch": "2025-07-21T16:00:00Z",
+      "cartographicDegrees": [
+        0, 139.69652636233502, 35.688096473634445, 90.44016762964581,
+        10, 139.69641741208943, 35.689257239518966, 100.59623064612005,
+        20, 139.6952032133655, 35.689337591772855, 90.53462474052557
+      ],
+      "forwardExtrapolationType": "HOLD",
+      "forwardExtrapolationDuration": 3600000,
+      "backwardExtrapolationType": "HOLD",
+      "backwardExtrapolationDuration": 3600000
+    },
+    "orientation": {
+      "velocityReference": "#position"
+    },
+    "model": {
+      "gltf": "/static/cesium-resources/model/defaultModel.glb",
+      "scale": 0.5,
+      "minimumPixelSize": 10,
+      "distanceDisplayCondition": {
+        "distanceDisplayCondition": [0, 5000]
+      },
+      "heightReference": "CLAMP_TO_GROUND"
+    },
+    "billboard": {
+      "image": "/public/static/cesium-resources/symbol/curve-flag.svg",
+      "scale": 0.3,
+      "distanceDisplayCondition": {
+        "distanceDisplayCondition": [5000, 1e7]
+      },
+      "heightReference": "CLAMP_TO_GROUND"
+    }
+  }
+]

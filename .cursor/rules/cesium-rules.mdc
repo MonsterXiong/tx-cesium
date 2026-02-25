@@ -1,0 +1,70 @@
+---
+description: Cesium 3D 地图开发规范 — Viewer 封装使用、配置管理、工具函数约定
+globs: src/cesium/**,src/cesiumApp/**,src/pages/cesium-view/**
+alwaysApply: false
+---
+
+# Cesium 开发规范
+
+## 架构概览
+
+```
+src/cesium/               — Cesium 核心封装
+├── CesiumViewer.tsx      — Viewer 组件（封装初始化和销毁）
+├── cesium-viewer.css     — Viewer 样式
+├── config.ts             — Cesium 全局配置和常用坐标
+└── utils/index.ts        — 工具函数
+
+src/hooks/useCesium.ts    — Cesium Hook（initViewer/flyTo/addPoint）
+src/cesiumApp/            — Cesium 材质和着色器
+```
+
+## 使用方式
+
+### 方式一：CesiumViewer 组件（推荐简单场景）
+
+```tsx
+import CesiumViewer from '@/cesium/CesiumViewer'
+
+<CesiumViewer
+  className="w-full h-full"
+  onViewerReady={(viewer) => {
+    console.log('[DEBUG_CESIUM] Viewer 就绪')
+  }}
+/>
+```
+
+### 方式二：useCesiumViewer Hook（推荐复杂交互）
+
+```tsx
+import { useCesiumViewer } from '@/hooks'
+
+const { viewer, loading, error, initViewer, flyTo, addPoint } = useCesiumViewer()
+
+// 初始化
+useEffect(() => {
+  if (containerRef.current) {
+    initViewer(containerRef.current)
+  }
+}, [])
+
+// 飞行到坐标 [经度, 纬度, 高度]
+flyTo([116.404, 39.915, 1000000])
+
+// 添加标记点
+addPoint([116.404, 39.915, 0], { name: '北京', color: Cesium.Color.RED })
+```
+
+## 配置管理
+
+- Cesium Token 通过环境变量 `VITE_CESIUM_ACCESS_TOKEN` 配置
+- 默认 Viewer 选项在 `src/cesium/config.ts` 的 `defaultViewerOptions` 中
+- 常用城市坐标在 `src/cesium/config.ts` 的 `locations` 对象中
+
+## 关键注意事项
+
+1. **必须清理 Viewer 实例**：组件卸载时调用 `viewer.destroy()`，防止内存泄漏
+2. **坐标格式统一**：使用 `[经度, 纬度, 高度]` 三元组
+3. **Cesium 资源**：由 `vite-plugin-cesium` 自动处理，直接 `import * as Cesium from 'cesium'`
+4. **内网部署**：不依赖 CDN，所有资源本地化
+5. **Console 前缀**：Cesium 相关日志使用 `[DEBUG_CESIUM]`
