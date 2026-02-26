@@ -33,6 +33,15 @@ export default defineConfig({
     'card-base': 'rounded-lg bg-bg-container shadow-sm border border-border p-4',
     'btn-base': 'px-4 py-2 rounded cursor-pointer transition-base',
   },
-  rules: [],
+  rules: [
+    // bd-t-border → border-top: 1px solid var(--color-border)
+    [
+      /^bd-(t|r|b|l)-(.+)$/,
+      ([, dir, color]) => {
+        const dirMap: Record<string, string> = { t: 'top', r: 'right', b: 'bottom', l: 'left' }
+        return { [`border-${dirMap[dir]}`]: `1px solid var(--color-${color})` }
+      },
+    ],
+  ],
 })
 

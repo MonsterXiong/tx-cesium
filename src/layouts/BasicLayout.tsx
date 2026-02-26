@@ -148,66 +148,55 @@ const BasicLayout: React.FC = () => {
 
   return (
     <Layout className="min-h-screen">
-      {/* 侧边栏 */}
-      <Sider trigger={null} collapsible collapsed={sidebarCollapsed} className="shadow-md">
+      {/* 头部 */}
+      <Header className="bg-bg-container flex-between px-4 shadow-sm h-4rem bd-b-border">
         <div className="h-16 text-[var(--color-text-heading)] font-bold">
-          {sidebarCollapsed ? (
-            <div className="h-full flex-center">{renderSystemIcon()}</div>
-          ) : (
-            <div className="h-full flex items-center gap-2 px-4">
-              <span className="flex-center w-7 h-7 rounded-md bg-[var(--color-primary-bg)] overflow-hidden">
-                {renderSystemIcon()}
-              </span>
-              <span className="text-lg truncate">{systemTitle}</span>
-            </div>
-          )}
+          <div className="h-full flex items-center gap-2 px-4">
+            <span className="flex-center w-7 h-7 rounded-md bg-[var(--color-primary-bg)] overflow-hidden">
+              {renderSystemIcon()}
+            </span>
+            <span className="text-lg truncate">{systemTitle}</span>
+          </div>
         </div>
-        <Menu
-          theme={mode === 'dark' ? 'dark' : 'light'}
-          mode="inline"
-          selectedKeys={[location.pathname]}
-          defaultOpenKeys={sidebarCollapsed ? [] : openKeys}
-          items={menuItems}
-          onClick={handleMenuClick}
-        />
-      </Sider>
-
-      <Layout>
-        {/* 头部 */}
-        <Header className="bg-bg-container border-b border-border flex-between px-4 shadow-sm">
-          <div className="flex items-center">
-            <Button
-              type="text"
-              icon={sidebarCollapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
-              onClick={toggleSidebar}
-              className="text-lg"
+        <div className="flex items-center gap-4">
+          {/* 主题切换 */}
+          <div className="flex items-center gap-2">
+            <SunOutlined className={mode === 'light' ? 'text-primary' : ''} />
+            <Switch
+              checked={mode === 'dark'}
+              onChange={toggleMode}
+              checkedChildren={<MoonOutlined />}
+              unCheckedChildren={<SunOutlined />}
             />
+            <MoonOutlined className={mode === 'dark' ? 'text-primary' : ''} />
           </div>
 
-          <div className="flex items-center gap-4">
-            {/* 主题切换 */}
-            <div className="flex items-center gap-2">
-              <SunOutlined className={mode === 'light' ? 'text-primary' : ''} />
-              <Switch
-                checked={mode === 'dark'}
-                onChange={toggleMode}
-                checkedChildren={<MoonOutlined />}
-                unCheckedChildren={<SunOutlined />}
-              />
-              <MoonOutlined className={mode === 'dark' ? 'text-primary' : ''} />
-            </div>
-
-            {/* 用户信息 */}
-            <Dropdown menu={{ items: userMenuItems, onClick: handleUserMenuClick }}>
-              <Button type="text" icon={<UserOutlined />}>
-                用户
-              </Button>
-            </Dropdown>
+          {/* 用户信息 */}
+          <Dropdown menu={{ items: userMenuItems, onClick: handleUserMenuClick }}>
+            <Button type="text" icon={<UserOutlined />}>
+              用户
+            </Button>
+          </Dropdown>
+        </div>
+      </Header>
+      <Layout className="h-[calc(100vh-4rem)]">
+        {/* 侧边栏 */}
+        <Sider theme="light"
+        trigger={
+          <div className="w-100% cursor-pointer bd-t-border font-size-lg">
+            {sidebarCollapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
           </div>
-        </Header>
-
+          } collapsible collapsed={sidebarCollapsed} onCollapse={toggleSidebar} className="shadow-md overflow-y-auto flex flex-col">
+          <Menu
+            mode="inline"
+            selectedKeys={[location.pathname]}
+            defaultOpenKeys={sidebarCollapsed ? [] : openKeys}
+            items={menuItems}
+            onClick={handleMenuClick}
+          />
+        </Sider>
         {/* 内容区域 */}
-        <Content className="m-2 bg-bg-container rounded-lg h-[calc(100vh-112px)]">
+        <Content className="m-0.5rem bg-bg-container rounded-lg h-[calc(100%-1rem)] overflow-y-auto overflow-x-hidden">
           <Outlet />
         </Content>
       </Layout>
